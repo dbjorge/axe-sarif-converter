@@ -14,6 +14,7 @@
         "node": ">= 8"
     },
     "dependencies": {
+        "@microsoft/sarif-multitool": "^0.1.26",
         "@types/sarif": ">=2.1.1 <=2.1.2",
         "axe-core": "^3.2.2",
         "yargs": "^15.0.2"

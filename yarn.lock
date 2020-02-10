@@ -425,6 +425,30 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
+"@microsoft/sarif-multitool-darwin@^0.1.26":
+  version "0.1.26"
+  resolved "https://registry.yarnpkg.com/@microsoft/sarif-multitool-darwin/-/sarif-multitool-darwin-0.1.26.tgz#fd976f9953293ee962603696499aaa92ff133928"
+  integrity sha512-sgnPMO2mvI2fIqjSrDGry/eLaS0SVEfPQw7jA4KYbNxLnwVhwmUzmw6AZxTRK7mzCTfLwvA72qM020iqJoFNXQ==
+
+"@microsoft/sarif-multitool-linux@^0.1.26":
+  version "0.1.26"
+  resolved "https://registry.yarnpkg.com/@microsoft/sarif-multitool-linux/-/sarif-multitool-linux-0.1.26.tgz#99da3af9b7cdfaec787af7f185c983c02fc7825c"
+  integrity sha512-TgrXvA1X59s90WCkFPgjWOsKcQ1RSRIXEtngPcKf4ptKQkpHf0Ogmoj/vm4sCq/y9VS1XtDbSWI1Cw/4B6vgWw==
+
+"@microsoft/sarif-multitool-win32@^0.1.26":
+  version "0.1.26"
+  resolved "https://registry.yarnpkg.com/@microsoft/sarif-multitool-win32/-/sarif-multitool-win32-0.1.26.tgz#c184cc3dae4d52198e127fd8370d606c44a556a7"
+  integrity sha512-Q94npeCRX9rkLe7ZGTpKONkYZmXcCBCMM+MYn2SaIse4XTNwOaefkTvnjpJwaEREavZ+ApLnZaqIhEzm4IGXJA==
+
+"@microsoft/sarif-multitool@^0.1.26":
+  version "0.1.26"
+  resolved "https://registry.yarnpkg.com/@microsoft/sarif-multitool/-/sarif-multitool-0.1.26.tgz#eeb4519bc3fc062f8ed8827a362768732df50ccc"
+  integrity sha512-kn9UMsR3PLTKsJFUAxO+r/CwczR4Yn4PfYxNlzneIxP6Z+KgzkpCUylJEOK2OgEYrEuxYk1PSdbMyH/h+a9qtQ==
+  optionalDependencies:
+    "@microsoft/sarif-multitool-darwin" "^0.1.26"
+    "@microsoft/sarif-multitool-linux" "^0.1.26"
+    "@microsoft/sarif-multitool-win32" "^0.1.26"
+
 "@nodelib/fs.scandir@2.1.1":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@nodelib/fs.scandir/-/fs.scandir-2.1.1.tgz#7fa8fed654939e1a39753d286b48b4836d00e0eb"
@@ -4788,7 +4812,6 @@ npm@^6.10.3:
     cmd-shim "^3.0.3"
     columnify "~1.5.4"
     config-chain "^1.1.12"
-    debuglog "*"
     detect-indent "~5.0.0"
     detect-newline "^2.1.0"
     dezalgo "~1.0.3"
@@ -4803,7 +4826,6 @@ npm@^6.10.3:
     has-unicode "~2.0.1"
     hosted-git-info "^2.8.5"
     iferr "^1.0.2"
-    imurmurhash "*"
     infer-owner "^1.0.4"
     inflight "~1.0.6"
     inherits "^2.0.4"
@@ -4822,14 +4844,8 @@ npm@^6.10.3:
     libnpx "^10.2.0"
     lock-verify "^2.1.0"
     lockfile "^1.0.4"
-    lodash._baseindexof "*"
     lodash._baseuniq "~4.6.0"
-    lodash._bindcallback "*"
-    lodash._cacheindexof "*"
-    lodash._createcache "*"
-    lodash._getnative "*"
     lodash.clonedeep "~4.5.0"
-    lodash.restparam "*"
     lodash.union "~4.6.0"
     lodash.uniq "~4.5.0"
     lodash.without "~4.4.0"
