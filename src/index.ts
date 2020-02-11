@@ -4,16 +4,26 @@ import * as Axe from 'axe-core';
 import * as Sarif from 'sarif';
 import { AxeRawResult } from './axe-raw-result';
 import { defaultAxeRawSarifConverter } from './axe-raw-sarif-converter';
+import { applyBaselineFile } from './baseline';
 import { ConverterOptions } from './converter-options';
 import { EnvironmentData } from './environment-data';
 import { getEnvironmentDataFromEnvironment } from './environment-data-provider';
 import { defaultSarifConverter } from './sarif-converter';
 
+export { ConverterOptions } from './converter-options';
 export type SarifLog = Sarif.Log;
 
-export function convertAxeToSarif(axeResults: Axe.AxeResults): SarifLog {
+export function convertAxeToSarif(
+    axeResults: Axe.AxeResults,
+    options?: ConverterOptions,
+): SarifLog {
+    options = options || {};
     const sarifConverter = defaultSarifConverter();
-    return sarifConverter.convert(axeResults, {});
+    let results = sarifConverter.convert(axeResults, options);
+    if (options.baselineFile != null) {
+        results = applyBaselineFile(results, options.baselineFile);
+    }
+    return results;
 }
 
 export function sarifReporter(

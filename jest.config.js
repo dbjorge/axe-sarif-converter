@@ -12,7 +12,7 @@ module.exports = {
     verbose: false,
     coverageDirectory: '../test-results/coverage',
     displayName: 'unit tests',
-    moduleFileExtensions: ['ts', 'js'],
+    moduleFileExtensions: ['ts', 'js', 'json'],
     rootDir: rootDir,
     collectCoverage: true,
     collectCoverageFrom: [

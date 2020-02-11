@@ -155,6 +155,18 @@ describe('axe-sarif-converter CLI', () => {
         expect(lines.every(line => line.length < 200)).toBe(true);
     });
 
+    it.each(['-b', '--baseline-file'])('baselines', async baselineArg => {
+        const outputFile = path.join(testResultsDir, 'baselines.sarif');
+        await deleteIfExists(outputFile);
+
+        await invokeCliWith(
+            `-i ${basicAxeV2File} -o ${outputFile} ${baselineArg} ${basicSarifFile}`,
+        );
+
+        const outputContents = (await readFile(outputFile)).toString();
+        expect(outputContents).toContain('"baselineState":"unchanged"');
+    });
+
     async function invokeCliWith(
         args: string,
     ): Promise<{ stderr: string; stdout: string }> {

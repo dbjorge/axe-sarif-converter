@@ -46,6 +46,26 @@ test('my accessibility test', async () => {
 }
 ```
 
+The converter supports using the [SARIF Multitool](https://github.com/microsoft/sarif-sdk)
+to compare results against a baseline file, and annotate results in the SARIF
+with a corresponding baselineState property. You can filter results based on
+baselineState in a SARIF viewer, or you can use it in test expectations:
+
+```ts
+const sarifResults: SarifLog = convertAxeToSarif(axeResults, {
+    // Apply a baseline file to get baselineState annotations on results
+    baselineFile: './previously-generated-output.sarif',
+});
+
+// Filter results based on the baselineState property
+const newResultsSinceBaseline = sarifResults.runs[0].results.filter(
+    result => result.baselineState === 'new',
+);
+
+// Use the filtered results in a test expectation
+expect(newResultsSinceBaseline).toEqual([]);
+```
+
 You can also use axe-sarif-converter as a command line tool:
 
 ```bash
@@ -54,6 +74,9 @@ You can also use axe-sarif-converter as a command line tool:
 npx axe-cli https://accessibilityinsights.io --save ./sample-axe-results.json
 
 npx axe-sarif-converter --input-files ./sample-axe-results.json --output-file ./sample-axe-results.sarif
+
+# or, with a baseline file:
+npx axe-sarif-converter --input-files ./sample-axe-results.json --output-file ./sample-axe-results.sarif --baseline-file ./baseline.sarif
 ```
 
 See `npx axe-sarif-converter --help` for full command line option details.

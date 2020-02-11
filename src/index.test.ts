@@ -14,11 +14,15 @@ import { AxeRawResult } from './axe-raw-result';
 import { convertAxeToSarif, SarifLog, sarifReporter } from './index';
 import { testResourceTimestampPlaceholder } from './test-resource-constants';
 
+function testResourceFilePath(testResourceFileName: string): string {
+    return path.join('./src/test-resources', testResourceFileName);
+}
+
 function readTestResourceJSON(testResourceFileName: string): any {
     const rawFileContents: string = fs.readFileSync(
         // Allowing for test-only code
         // tslint:disable-next-line: non-literal-fs-path
-        path.join('./src/test-resources', testResourceFileName),
+        testResourceFilePath(testResourceFileName),
         'utf8',
     );
     return JSON.parse(rawFileContents);
@@ -68,6 +72,58 @@ describe('public convertAxeToSarif API', () => {
             expect(actualOutput).toEqual(expectedOutput);
         },
     );
+
+    it.each`
+        inputFile                                     | baselineFile
+        ${'basic-axe-v3.4.1.reporter-v1.json'}        | ${'basic-axe-v3.4.1.sarif'}
+        ${'w3citylights-axe-v3.4.1.reporter-v1.json'} | ${'w3citylights-axe-v3.4.1.sarif'}
+    `(
+        'produces files with "unchanged" baseline states for $inputFile when applying to its own results from $baselineFile',
+        ({ inputFile, baselineFile }) => {
+            const input: AxeResults = readTestResourceJSON(inputFile);
+
+            const actualOutput: SarifLog = convertAxeToSarif(input, {
+                baselineFile: testResourceFilePath(baselineFile),
+            });
+
+            for (const result of actualOutput.runs[0]!.results!) {
+                expect(result).toHaveProperty('baselineState', 'unchanged');
+            }
+        },
+    );
+
+    it.each`
+        inputFile                                     | baselineFile
+        ${'basic-axe-v3.4.1.reporter-v1.json'}        | ${'empty-axe-v3.4.1.sarif'}
+        ${'w3citylights-axe-v3.4.1.reporter-v1.json'} | ${'empty-axe-v3.4.1.sarif'}
+    `(
+        'produces files with "new" baseline states for $inputFile when applying empty results from $baselineFile',
+        ({ inputFile, baselineFile }) => {
+            const input: AxeResults = readTestResourceJSON(inputFile);
+
+            const actualOutput: SarifLog = convertAxeToSarif(input, {
+                baselineFile: testResourceFilePath(baselineFile),
+            });
+
+            for (const result of actualOutput.runs[0]!.results!) {
+                expect(result).toHaveProperty('baselineState', 'new');
+            }
+        },
+    );
+
+    it('emits a reasonable exception when the SARIF Multitool outputs an error', () => {
+        const input: AxeResults = readTestResourceJSON(
+            'basic-axe-v3.4.1.reporter-v1.json',
+        );
+
+        expect(() =>
+            convertAxeToSarif(input, {
+                baselineFile: 'doesnt_exist.sarif',
+            }),
+        ).toThrowError(
+            /SARIF Multitool failed with exit code 1\. Full output:\s+System\.IO\.FileNotFoundException/,
+        );
+    });
 });
 
 // This initializes global state that the reporter API assumes is available

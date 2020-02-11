@@ -1,15 +1,16 @@
 #!/usr/bin/env node
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT License.
-
 import * as fs from 'fs';
 import { Log } from 'sarif';
 import * as yargs from 'yargs';
-import { convertAxeToSarif } from '.';
+import { convertAxeToSarif, ConverterOptions } from '.';
+import { applyBaselineFile } from './baseline';
 
 type Arguments = {
     'input-files': string[];
     'output-file': string;
+    'baseline-file'?: string;
     verbose: boolean;
     pretty: boolean;
     force: boolean;
@@ -37,6 +38,12 @@ const argv: Arguments = yargs
         demandOption: true,
         type: 'string',
     })
+    .option('baseline-file', {
+        alias: 'b',
+        describe:
+            'Baseline SARIF file. If specified, results in the output SARIF file will be annotated with a baselineState property. Should correspond to a past output file from the same version/options of this tool.',
+        type: 'string',
+    })
     .option('verbose', {
         alias: 'v',
         describe: 'Enables verbose console output.',
@@ -57,6 +64,11 @@ const argv: Arguments = yargs
     }).argv;
 
 const verboseLog = argv.verbose ? console.log : () => {};
+
+// We intentionally omit baselineFile because in the multiple-input-file case,
+// we want to invoke applyBaselineFile over the combined log rather than each
+// individual log
+const converterOptions: ConverterOptions = {};
 
 function exitWithErrorMessage(message: string) {
     console.error(message);
@@ -83,20 +95,27 @@ const sarifLogs: Log[] = flatten(
         const inputFileJson = JSON.parse(rawInputFileContents.toString());
         if (Array.isArray(inputFileJson)) {
             // Treating as array of axe results, like axe-cli produces
-            return inputFileJson.map(convertAxeToSarif);
+            return inputFileJson.map(input =>
+                convertAxeToSarif(input, converterOptions),
+            );
         } else {
             // Treating as a single axe results object, like
             // JSON.stringify(await axe.run(...)) would produce
-            return [convertAxeToSarif(inputFileJson)];
+            return [convertAxeToSarif(inputFileJson, converterOptions)];
         }
     }),
 );
 
 verboseLog(`Aggregating converted input file(s) into one SARIF log`);
-const combinedLog: Log = {
+let combinedLog: Log = {
     ...sarifLogs[0],
     runs: flatten(sarifLogs.map(log => log.runs)),
 };
+
+if (argv['baseline-file'] != undefined) {
+    verboseLog('Applying baseline file to aggregated SARIF log');
+    combinedLog = applyBaselineFile(combinedLog, argv['baseline-file']);
+}
 
 verboseLog(`Formatting SARIF data into file contents`);
 const jsonSpacing = argv.pretty ? 2 : undefined;
